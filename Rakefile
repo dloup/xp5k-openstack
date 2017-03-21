@@ -53,6 +53,19 @@ XP5K::Config[:openstack_env]  ||= {
   OS_AUTH_URL: 'http://127.0.0.1:5000/v2.0'
 }
 
+# Define Roles
+XP5K::Role.new({
+  name: 'puppetserver',
+  servers: ['puppet-server.openstacklocal'],
+  size: 1
+}).add
+
+XP5K::Role.new({
+  name: 'controller',
+  servers: ['controller.openstacklocal'],
+  size: 1
+}).add
+
 
 # Definitions
 #
@@ -90,8 +103,6 @@ end
 desc 'Start Openstack deployment'
 task :run do
   workflow = [
-    'grid5000:jobs',
-    'grid5000:deploy',
     'puppet:agent:install',
     'puppet:hiera:generate',
     'puppet:server:bootstrap',
