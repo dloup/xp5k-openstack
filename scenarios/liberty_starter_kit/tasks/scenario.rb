@@ -65,20 +65,12 @@ namespace :scenario do
     desc 'Configure public bridge'
     task :public_bridge do
       on(roles('controller'), user: 'root') do
-        %{ ovs-vsctl add-port br-ex eth0 && ip addr flush && dhclient -nw br-ex }
+        %{ ovs-vsctl add-port br-ex eth0 && ip addr flush eth0 && dhclient -nw br-ex }
       end
     end
 
     desc 'Configure Openstack network'
     task :network do
-      site_infos = xp.connection.root.sites[XP5K::Config[:site].to_sym]
-      publicSubnet = site_infos['g5ksubnet']
-      reservedSubnet = xp.job_with_name(XP5K::Config[:jobname])['resources_by_type']['subnets'].first
-      publicPool = IPAddr.new(reservedSubnet).to_range.to_a[10..100]
-      publicPoolStart,publicPoolStop = publicPool.first.to_s,publicPool.last.to_s
-      privateCIDR = '192.168.1.0/24'
-      privatePool = IPAddr.new(privateCIDR).to_range.to_a[10..100]
-      privatePoolStart,privatePoolStop = privatePool.first.to_s,privatePool.last.to_s
       on(roles('controller'), user: 'root', environment: XP5K::Config[:openstack_env]) do
         cmd = []
         cmd << %{neutron net-create public --shared --provider:physical_network external --provider:network_type flat --router:external True}
