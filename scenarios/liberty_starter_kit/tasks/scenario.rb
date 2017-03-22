@@ -29,34 +29,10 @@ namespace :scenario do
       'scenario:os:flavors',
       'scenario:os:images',
       'scenario:os:network',
-      'scenario:horizon_access'
     ]
     workflow.each do |task|
       Rake::Task[task].execute
     end
-  end
-
-  desc 'Show SSH configuration to access Horizon'
-  task :horizon_access do
-    puts '---'
-    script = %{cat > /tmp/openstack_ssh_config <<EOF\n}
-    script += %{Host *.grid5000.fr\n}
-    script += %{  User #{XP5K::Config[:user]}\n}
-    script += %{  ProxyCommand ssh -q #{XP5K::Config[:user]}@194.254.60.4 nc -w1 %h %p # Access South\n}
-    script += %{EOF\n}
-    script += %{ssh -F /tmp/openstack_ssh_config -N -L 8080:#{roles('controller').first}:8080 #{XP5K::Config[:user]}@frontend.#{XP5K::Config[:site]}.grid5000.fr &\n}
-    script += %{HTTP_PID=$!\n}
-    script += %{ssh -F /tmp/openstack_ssh_config -N -L 6080:#{roles('controller').first}:6080 #{XP5K::Config[:user]}@frontend.#{XP5K::Config[:site]}.grid5000.fr &\n}
-    script += %{CONSOLE_PID=$!\n}
-    script += %{trap 'kill -9 $HTTP_PID && kill -9 $CONSOLE_PID' 2\n}
-    script += %{echo 'http://localhost:8080'\n}
-    script += %{wait\n}
-    puts script
-    puts '---'
-    File.open('./dashboard_tunnels.sh', 'w') do |file|
-      file.puts script
-    end
-    puts '** Script ./dashboard_tunnels.sh generated (to execute on your computer).'
   end
 
   namespace :hiera do
@@ -88,17 +64,8 @@ namespace :scenario do
 
     desc 'Configure public bridge'
     task :public_bridge do
-      controllerHostname = roles('controller').first.split('.').first
-      clusterName = controllerHostname.split('-').first
-      restfullyDatas = xp.connection.root
-      .sites[XP5K::Config[:site].to_sym]
-      .clusters[clusterName.to_sym]
-      .nodes.select { |i| i['uid'] == controllerHostname }.first
-      device = restfullyDatas['network_adapters'].select { |interface|
-        interface['mounted'] == true
-      }.first['device']
       on(roles('controller'), user: 'root') do
-        %{ ovs-vsctl add-port br-ex #{device} && ip addr flush #{device} && dhclient -nw br-ex }
+        %{ ovs-vsctl add-port br-ex eth0 && ip addr flush && dhclient -nw br-ex }
       end
     end
 
@@ -116,8 +83,8 @@ namespace :scenario do
         cmd = []
         cmd << %{neutron net-create public --shared --provider:physical_network external --provider:network_type flat --router:external True}
         cmd << %{neutron net-create private}
-        cmd << %{neutron subnet-create public #{publicSubnet['network']} --name public-subnet --allocation-pool start=#{publicPoolStart},end=#{publicPoolStop} --gateway #{publicSubnet['gateway']}  --disable-dhcp}
-        cmd << %{neutron subnet-create private #{privateCIDR} --name private-subnet --dns-nameserver $(gethostip -d dns) --allocation-pool start=#{privatePoolStart},end=#{privatePoolStop}}
+        cmd << %{neutron subnet-create public 10.140.80.0/22 --name public-subnet --allocation-pool start=10.140.80.60,end=10.140.80.65 --gateway 10.140.83.254  --disable-dhcp}
+        cmd << %{neutron subnet-create private 192.168.0.0/24 --name private-subnet --dns-nameserver 8.8.8.8 --allocation-pool start=192.168.0.100,end=192.168.0.200}
         cmd << %{neutron router-create main_router}
         cmd << %{neutron router-gateway-set main_router public}
         cmd << %{neutron router-interface-add main_router private-subnet}
@@ -138,8 +105,8 @@ namespace :scenario do
         [
            %{/usr/bin/wget -q -O /tmp/cirros.img http://download.cirros-cloud.net/0.3.4/cirros-0.3.4-x86_64-disk.img},
            %{glance image-create --name="Cirros" --disk-format=qcow2 --container-format=bare --property architecture=x86_64 --progress --file /tmp/cirros.img},
-           %{/usr/bin/wget -q -O /tmp/debian.img http://public.rennes.grid5000.fr/openstack/debian-8.3.0-openstack-amd64.qcow2},
-           %{glance image-create --name="Debian Jessie 64-bit" --disk-format=qcow2 --container-format=bare --property architecture=x86_64 --progress --file /tmp/debian.img}
+           #%{/usr/bin/wget -q -O /tmp/debian.img http://public.rennes.grid5000.fr/openstack/debian-8.3.0-openstack-amd64.qcow2},
+           #%{glance image-create --name="Debian Jessie 64-bit" --disk-format=qcow2 --container-format=bare --property architecture=x86_64 --progress --file /tmp/debian.img}
         ]
       end
     end
