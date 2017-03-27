@@ -10,6 +10,7 @@ scenarios/*/puppet/modules-openstack
 scenarios/*
 !scenarios/liberty_starter_kit
 !scenarios/liberty_multinodes
+!scenarios/liberty_CC
 
 dashboard_tunnels.sh
 
