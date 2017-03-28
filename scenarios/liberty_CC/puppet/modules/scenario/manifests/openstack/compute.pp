@@ -70,7 +70,7 @@ class scenario::openstack::compute (
 
   class { '::neutron::agents::ml2::ovs':
     enable_tunneling => true,
-    local_ip         => ip_for_network($data_network),
+    local_ip         => facter(ipaddress),
     enabled          => true,
     tunnel_types     => ['vxlan'],
   }

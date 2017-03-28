@@ -8,6 +8,7 @@ class scenario::openstack::glance (
 
   class { '::glance::db::mysql':
     password => 'glance',
+    allowed_hosts => ['localhost', '127.0.0.1', '%']
   }
 
   file {

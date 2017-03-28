@@ -9,6 +9,7 @@ class scenario::openstack::neutron (
 
   class { '::neutron::db::mysql':
     password => 'neutron',
+    allowed_hosts => ['localhost', '127.0.0.1', '%']
   }
   class { '::neutron::keystone::auth':
     password => $admin_password,
@@ -37,7 +38,7 @@ class scenario::openstack::neutron (
   }
   class { '::neutron::agents::ml2::ovs':
     enable_tunneling => true,
-    local_ip         => '127.0.0.1',
+    local_ip         => facter(ipaddress),
     tunnel_types     => ['vxlan'],
     bridge_mappings  => ["public:br-ex"],
   }
