@@ -11,6 +11,7 @@ scenarios/*
 !scenarios/liberty_starter_kit
 !scenarios/liberty_multinodes
 !scenarios/liberty_CC
+!scenarios/liberty_compute
 
 dashboard_tunnels.sh
 
