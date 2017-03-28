@@ -4,6 +4,8 @@
 
 class scenario::openstack::glance (
   String $admin_password = $scenario::openstack::params::admin_password
+  String $controller_public_address = $scenario::openstack::params::controller_public_address
+  String $storage_public_address = $scenario::openstack::params::controller_public_address
 ) inherits scenario::openstack::params {
 
   class { '::glance::db::mysql':
@@ -35,6 +37,9 @@ class scenario::openstack::glance (
 
   class { '::glance::keystone::auth':
     password => $admin_password,
+    public_url   => "http://${storage_public_address}:9292",
+    internal_url => "http://${storage_public_address}:9292",
+    admin_url    => "http://${storage_public_address}:9292"
   }
 
   class { '::glance::api':

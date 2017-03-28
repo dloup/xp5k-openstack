@@ -1,4 +1,3 @@
-
 class scenario::openstack::controller(
   String $package_provider = $scenario::openstack::params::package_provider,
   String $admin_password = $scenario::openstack::params::admin_password,

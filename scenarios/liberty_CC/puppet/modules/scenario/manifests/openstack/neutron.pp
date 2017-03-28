@@ -5,6 +5,7 @@
 class scenario::openstack::neutron (
   String $admin_password = $scenario::openstack::params::admin_password,
   String $primary_interface = $scenario::openstack::params::primary_interface
+  String $controller_public_address = $scenario::openstack::params::controller_public_address
 ) inherits scenario::openstack::params {
 
   class { '::neutron::db::mysql':
@@ -13,6 +14,9 @@ class scenario::openstack::neutron (
   }
   class { '::neutron::keystone::auth':
     password => $admin_password,
+    public_url   => "http://${controller_public_address}:9696",
+    internal_url => "http://${controller_public_address}:9696",
+    admin_url    => "http://${controller_public_address}:9696"
   }
   class { '::neutron':
     rabbit_user           => 'neutron',
@@ -26,9 +30,10 @@ class scenario::openstack::neutron (
   }
   class { '::neutron::client': }
   class { '::neutron::server':
-    database_connection => 'mysql://neutron:neutron@127.0.0.1/neutron?charset=utf8',
+    database_connection => "mysql://neutron:neutron@${controller_public_address}/neutron?charset=utf8",
     auth_password       => $admin_password,
-    identity_uri        => 'http://127.0.0.1:35357/',
+    identity_uri        => "http://${controller_public_address}:35357/",
+    auth_uri            => "http://${controller_public_address}:5000",
     sync_db             => true,
   }
   class { '::neutron::plugins::ml2':
