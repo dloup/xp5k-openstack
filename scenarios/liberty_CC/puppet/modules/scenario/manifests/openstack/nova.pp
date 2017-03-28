@@ -4,7 +4,6 @@
 
 class scenario::openstack::nova (
   String $admin_password = $scenario::openstack::params::admin_password
-  String $controller_public_address = $scenario::openstack::params::controller_public_address
 ) inherits scenario::openstack::params {
 
   class {
@@ -45,11 +44,11 @@ class scenario::openstack::nova (
 
   class {
     '::nova':
-      database_connection => 'mysql://nova:nova@${controller_public_address}/nova?charset=utf8',
-      rabbit_host         => '$controller_public_address',
+      database_connection => 'mysql://nova:nova@127.0.0.1/nova?charset=utf8',
+      rabbit_host         => '127.0.0.1',
       rabbit_userid       => 'nova',
       rabbit_password     => 'an_even_bigger_secret',
-      glance_api_servers  => '${controller_public_address}:9292',
+      glance_api_servers  => 'localhost:9292',
       verbose             => true,
       debug               => true;
   }
@@ -57,7 +56,7 @@ class scenario::openstack::nova (
   class {
     '::nova::api':
       admin_password                       => $admin_password,
-      identity_uri                         => 'http://${controller_public_address}:35357/',
+      identity_uri                         => 'http://127.0.0.1:35357/',
       osapi_v3                             => true,
       neutron_metadata_proxy_shared_secret => $admin_password,
   }
@@ -83,7 +82,7 @@ class scenario::openstack::nova (
   class { '::nova::vncproxy': }
   class { '::nova::network::neutron':
     neutron_admin_password => $admin_password,
-    neutron_admin_auth_url => 'http://${controller_public_address}:35357/v2.0',
+    neutron_admin_auth_url => 'http://127.0.0.1:35357/v2.0',
   }
 
 }

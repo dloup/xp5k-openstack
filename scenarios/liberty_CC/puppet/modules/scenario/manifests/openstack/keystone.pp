@@ -10,6 +10,7 @@ class scenario::openstack::keystone (
   class { '::keystone::cron::token_flush': }
   class { '::keystone::db::mysql':
     password => 'keystone',
+    allowed_hosts => ['localhost', '127.0.0.1', '%']
   }
   class { '::keystone':
     verbose             => true,
@@ -30,6 +31,9 @@ class scenario::openstack::keystone (
   }
   class { '::keystone::endpoint':
     default_domain => 'admin',
+    public_url   => "http://${controller_public_address}:5000",
+    internal_url => "http://${controller_public_address}:5000",
+    admin_url    => "http://${controller_public_address}:35357"
   }
 
   /**
