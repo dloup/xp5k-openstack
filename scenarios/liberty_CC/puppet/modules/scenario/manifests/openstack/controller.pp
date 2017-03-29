@@ -43,11 +43,6 @@ class scenario::openstack::controller(
     admin_url    => "http://${controller_public_address}:9696"
   }
   
-  # common config between neutron and computes
-  class {'::scenario::common::neutron':
-    controller_public_address => $controller_public_address
-  }
-
   class { '::neutron::client': }
   class { '::neutron::server':
     database_connection => "mysql://neutron:neutron@${controller_public_address}/neutron?charset=utf8",
