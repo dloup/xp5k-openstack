@@ -5,7 +5,6 @@
 class scenario::openstack::network (
   String $admin_password = $scenario::openstack::params::admin_password,
   String $controller_public_address = $scenario::openstack::params::controller_public_address,
-  String $data_network = $scenario::openstack::params::data_network
 ) inherits scenario::openstack::params {
 
 
@@ -15,7 +14,7 @@ class scenario::openstack::network (
 
   class { '::neutron::agents::ml2::ovs':
     enable_tunneling => true,
-    local_ip         => ip_for_network($data_network),
+    local_ip         => $ipaddress_eth0,
     tunnel_types     => ['vxlan'],
     bridge_mappings  => ["public:br-ex"],
   }
