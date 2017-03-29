@@ -4,7 +4,7 @@
 
 class scenario::openstack::neutron (
   String $admin_password = $scenario::openstack::params::admin_password,
-  String $primary_interface = $scenario::openstack::params::primary_interface
+  String $primary_interface = $scenario::openstack::params::primary_interface,
   String $controller_public_address = $scenario::openstack::params::controller_public_address
 ) inherits scenario::openstack::params {
 
