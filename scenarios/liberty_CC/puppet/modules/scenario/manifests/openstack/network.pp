@@ -14,7 +14,7 @@ class scenario::openstack::network (
 
   class { '::neutron::agents::ml2::ovs':
     enable_tunneling => true,
-    local_ip         => $ipaddress_eth0,
+    local_ip         => $ipaddress,
     tunnel_types     => ['vxlan'],
     bridge_mappings  => ["public:br-ex"],
   }
