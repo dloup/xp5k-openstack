@@ -1,0 +1,9 @@
+---
+classes:
+- xp::puppet::server
+#Uncomment after OS modules copy- scenario::openstack::controller
+#Uncomment after OS modules copy- scenario::openstack::network
+#Uncomment after OS modules copy- scenario::openstack::storage
+
+puppet::server::autosign:
+- host1
