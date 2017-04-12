@@ -75,7 +75,8 @@ namespace :scenario do
         cmd = []
         cmd << %{neutron net-create public --shared --provider:physical_network external --provider:network_type flat --router:external True}
         cmd << %{neutron net-create private}
-        cmd << %{neutron subnet-create public 10.140.80.0/22 --name public-subnet --allocation-pool start=10.140.80.60,end=10.140.80.65 --gateway 10.140.83.254  --disable-dhcp}
+        #INSERT_PUBLIC_NET_CONF_HERE
+        #cmd << %{neutron subnet-create public 10.140.80.0/22 --name public-subnet --allocation-pool start=10.140.80.60,end=10.140.80.65 --gateway 10.140.83.254  --disable-dhcp}
         cmd << %{neutron subnet-create private 192.168.0.0/24 --name private-subnet --dns-nameserver 8.8.8.8 --allocation-pool start=192.168.0.100,end=192.168.0.200}
         cmd << %{neutron router-create main_router}
         cmd << %{neutron router-gateway-set main_router public}
@@ -97,8 +98,6 @@ namespace :scenario do
         [
            %{/usr/bin/wget -q -O /tmp/cirros.img http://download.cirros-cloud.net/0.3.4/cirros-0.3.4-x86_64-disk.img},
            %{glance image-create --name="Cirros" --disk-format=qcow2 --container-format=bare --property architecture=x86_64 --progress --file /tmp/cirros.img},
-           #%{/usr/bin/wget -q -O /tmp/debian.img http://public.rennes.grid5000.fr/openstack/debian-8.3.0-openstack-amd64.qcow2},
-           #%{glance image-create --name="Debian Jessie 64-bit" --disk-format=qcow2 --container-format=bare --property architecture=x86_64 --progress --file /tmp/debian.img}
         ]
       end
     end
