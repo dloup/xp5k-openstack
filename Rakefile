@@ -53,19 +53,8 @@ XP5K::Config[:openstack_env]  ||= {
   OS_AUTH_URL: 'http://127.0.0.1:5000/v2.0'
 }
 
-# Define Roles
-XP5K::Role.new({
-  name: 'puppetserver',
-  servers: ['puppet-server.openstacklocal'],
-  size: 1
-}).add
-
-XP5K::Role.new({
-  name: 'controller',
-  servers: ['controller.openstacklocal'],
-  size: 1
-}).add
-
+# CC_roles.cfg defines roles ( as the reservation and deployment are not made with xp5k)
+load "CC_roles.cfg"
 
 # Definitions
 #
