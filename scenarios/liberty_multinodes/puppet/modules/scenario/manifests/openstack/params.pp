@@ -4,14 +4,10 @@
 
 class scenario::openstack::params {
 
-  $admin_password = 'admin'
+  $admin_password = hiera("scenario::openstack::admin_password")
 
   $controller_public_address = hiera("scenario::openstack::controller_public_address")
   $storage_public_address = hiera("scenario::openstack::storage_public_address")
-
-  $public_network = hiera("scenario::openstack::public_network")
-  $data_network = hiera("scenario::openstack::data_network")
-
 
   case $::osfamily {
     'Debian': {
